@@ -8,54 +8,65 @@
 
 (nc.cbreak)
 (nc.noecho)
-(nc.keypad (stdscr) T)
+(nc.keypad (nc.stdscr) T)
 
-(def msg "Enter a string: ")
-
-(nc.mvaddstr 0 0 msg)
-(nc.refresh)
-(nc.echo)
-(def inp (nc.getstr))
-(nc.noecho)
-(nc.mvprintw 1 0 "You entered: %.*s\n\r" int (len$ inp) ptr (!string-data-pointer inp))
-
-(nc.printw "Hello World !!!")
-
-(def ch0 0)
-(def ch1 0)
-(def ch2 0)
-
-(defn shiftch (newch) (do
-  (:= ch0 ch1)
-  (:= ch1 ch2)
-  (:= ch2 newch)
+(defn new-win (height width starty startx) (assoc
+  (local-win (nc.newwin height width starty startx)) (do
+    (println "created window with dimensions" width "x" height "at" startx "," starty ":" local-win)
+    (nc.box local-win 0 0)
+    (nc.border # a # b # c # d # e # f # g # h)
+    (nc.wrefresh local-win)
+    local-win
+  )
 ))
 
-(tmpfn ()
+(defn destroy-win (local-win)
   (do
-    (assoc (
-      stringify (\ (ch)
-        (if (and (>= ch 0) (< ch 256))
-          (&$ (repr (&$ ch)) 0)
-          (&$ "n" (repr ch) 0)
-        )
-      )
-      s0 (stringify ch0)
-      s1 (stringify ch1)
-      s2 (stringify ch2)
-    ) (do
-      (nc.mvprintw 3 3 "Got input: %s (%d)     " ptr (!string-data-pointer s0) int ch0)
-      (nc.mvprintw 4 3 "Got input: %s (%d)     " ptr (!string-data-pointer s1) int ch1)
-      (nc.mvprintw 5 3 "Got input: %s (%d)     " ptr (!string-data-pointer s2) int ch2)
-    ))
-
-    (nc.move 0 0)
-
+    (nc.wborder local-win #sp #sp #sp #sp #sp #sp #sp #sp)
+    (nc.wrefresh local-win)
     (nc.refresh)
+    (nc.delwin local-win)
+  )
+)
 
-    (shiftch (nc.getch))
+(def my-win nil)
+(def startx 0)
+(def starty 0)
+(def height 3)
+(def width 10)
+(def ch 0)
 
-    (if (= ch2 # q) () (rec))
+(:= starty (/ (- (nc.LINES) height) 2))
+(:= starty (/ (- (nc.COLS) width) 2))
+
+(nc.printw "Press F1 to exit")
+(nc.refresh)
+
+(:= my-win (new-win height width starty startx))
+
+(tmpfn ()
+  (if (!= (:= ch (nc.getch)) 265) ; F1 key
+    (do
+      (switch ch
+        (case 260 (do ; left arrow
+          (destroy-win my-win)
+          (:= my-win (new-win height width starty (-- startx)))
+        ))
+        (case 261 (do ; right arrow
+          (destroy-win my-win)
+          (:= my-win (new-win height width starty (++ startx)))
+        ))
+        (case 259 (do ; up arrow
+          (destroy-win my-win)
+          (:= my-win (new-win height width (-- starty) startx))
+        ))
+        (case 258 (do ; down arrow
+          (destroy-win my-win)
+          (:= my-win (new-win height width (++ starty) startx))
+        ))
+      )
+      (rec)
+    )
   )
   ()
 )
