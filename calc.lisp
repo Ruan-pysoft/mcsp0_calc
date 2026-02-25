@@ -10,6 +10,15 @@
 (nc.noecho)
 (nc.keypad (stdscr) T)
 
+(def msg "Enter a string: ")
+
+(nc.mvaddstr 0 0 msg)
+(nc.refresh)
+(nc.echo)
+(def inp (nc.getstr))
+(nc.noecho)
+(nc.mvprintw 1 0 "You entered: %.*s\n\r" int (len$ inp) ptr (!string-data-pointer inp))
+
 (nc.printw "Hello World !!!")
 
 (def ch0 0)
@@ -26,7 +35,7 @@
   (do
     (assoc (
       stringify (\ (ch)
-        (if (< ch 256)
+        (if (and (>= ch 0) (< ch 256))
           (&$ (repr (&$ ch)) 0)
           (&$ "n" (repr ch) 0)
         )

@@ -6,6 +6,7 @@
   (exit 1)
 ))
 
+(def u8 ' u8)
 (def int ' i32)
 (def i64 ' i64)
 (def u64 ' u64)
@@ -65,6 +66,9 @@
 )
 (defn nc.noecho ()
   (nc.call "noecho" int)
+)
+(defn nc.echo? ()
+  (truthy? (nc.call "is_echo" int))
 )
 
 (defn nc.keypad (win bool)
@@ -257,14 +261,80 @@
   )
 )
 
+(defn getch ()
+  (nc.call "getch" int)
+)
+(defn wgetch (win)
+  (nc.call "wgetch" int ptr win)
+)
+(defn mvgetch (y x)
+  (nc.call "mvgetch" int int y int x)
+)
+(defn mvwgetch (y x win)
+  (nc.call "mvwgetch" int int y int x ptr win)
+)
+(defn ungetch (c)
+  (nc.call "ungetch" int int c)
+)
+
+; TODO: scanw?
+
+(defn nc.wgetnstr (win n)
+  (assoc (
+    buf (libc.malloc (+ n 1))
+    res ()
+  ) (do
+    (nc.call "wgetnstr" int ptr win ptr buf int n)
+    (:= res (tmpfn (res buf)
+      (if (!= (head (!destruct-val buf u8)) 0)
+        (rec
+          (&$ res (head (!destruct-val buf u8)))
+          (list ' pointer (+ (scd buf) 1))
+        )
+        res
+      )
+      ("" buf)
+    ))
+    (libc.free buf)
+    res
+  ))
+)
+(defn nc.getnstr (n) (nc.wgetnstr (stdscr) n))
+
+(defn nc.wgetstr (win) (tmpfn (acc)
+  (assoc (ch (wgetch win))
+    (switch ch
+      (case (- 1) acc)
+      (case # \n acc)
+      (case # \r acc)
+      (case 263 (if (len$ acc) ; backspace
+        (do
+          (if (nc.echo?) (do
+            (nc.waddch win #sp)
+            (nc.wmove win (nc.getcury win) (- (nc.getcurx win) 2))
+          ))
+          (rec ([]$ acc 0 (- (len$ acc) 1)))
+        )
+        (rec acc)
+      )) ; backspace
+      (default (if (and (>= ch 0) (< ch 256))
+        (rec (&$ acc ch))
+        (rec acc)
+      ))
+    )
+  )
+  ("")
+))
+(defn nc.getstr () (nc.wgetstr (stdscr)))
+
 (def .ncurses.stdscr (nc.var "stdscr"))
 (defn stdscr () (read-var ptr .ncurses.stdscr))
 
 ; libc functions
 
-(defn libc.malloc ()
-  (libc.call "malloc" ptr u64)
+(defn libc.malloc (size)
+  (libc.call "malloc" ptr u64 size)
 )
-(defn libc.free ()
-  (libc.call "free" void ptr)
+(defn libc.free (thing)
+  (libc.call "free" void ptr thing)
 )
