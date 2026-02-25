@@ -62,6 +62,15 @@
     args
   ))
 )
+(defn nc.mvprintw (y x fmt () args)
+  "each argument must be preceeded by a type!"
+  (call nc.call (chain-cons
+    "mvprintw" int
+    int y int x
+    ptr (!string-data-pointer fmt)
+    args
+  ))
+)
 
 (defn nc.refresh ()
   (nc.call "refresh" int)
@@ -69,6 +78,21 @@
 
 (defn nc.getch ()
   (nc.call "getch" int)
+)
+
+(defn nc.cbreak ()
+  (nc.call "cbreak" int)
+)
+
+(defn nc.echo ()
+  (nc.call "echo" int)
+)
+(defn nc.noecho ()
+  (nc.call "noecho" int)
+)
+
+(defn nc.keypad (win bool)
+  (nc.call "keypad" int ptr win int (if bool 1 0))
 )
 
 ; libc functions
@@ -81,10 +105,39 @@
 )
 
 ; main program
-(def stdscr (nc.var "stdscr"))
+(def .stdscr (nc.var "stdscr"))
+(defn stdscr () (read-var ptr .stdscr))
 
 (nc.initscr)
+
+(nc.cbreak)
+(nc.noecho)
+(nc.keypad (stdscr) T)
+
 (nc.printw "Hello World !!!")
 (nc.refresh)
-(nc.getch)
+
+(def ch0 0)
+(def ch1 0)
+(def ch2 0)
+
+(defn shiftch (newch) (do
+  (:= ch0 ch1)
+  (:= ch1 ch2)
+  (:= ch2 newch)
+))
+
+(tmpfn ()
+  (if (= (shiftch (nc.getch)) # q)
+    ()
+    (do
+      (nc.mvprintw 3 3 "Got input: '%c' (%d)     " int ch0 int ch0)
+      (nc.mvprintw 4 3 "Got input: '%c' (%d)     " int ch1 int ch1)
+      (nc.mvprintw 5 3 "Got input: '%c' (%d)     " int ch2 int ch2)
+      (rec)
+    )
+  )
+  ()
+)
+
 (nc.endwin)
