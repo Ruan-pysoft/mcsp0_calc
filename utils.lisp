@@ -35,4 +35,7 @@
     )
   )
 
+  (defn skip$ (s n) (if (>= (len$ s) n) ([]$ s n (len$ s)) ""))
+  (defn tail$ (s) (skip$ s 1))
+
 ))

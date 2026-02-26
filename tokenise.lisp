@@ -13,7 +13,7 @@
 
 (defn skip-while$ (text predicate)
   (if (check$ text predicate)
-    (skip-while$ ([]$ text 1 (len$ text)) predicate)
+    (skip-while$ (tail$ text) predicate)
     text
   )
 )
@@ -71,7 +71,7 @@
   (if (check$ text digit$?)
     (rec
       (+ (* acc 10) (- ([]$ text 0) # 0))
-      ([]$ text 1 (len$ text))
+      (tail$ text)
     )
       (list (list ' number acc) text)
   )
@@ -80,14 +80,14 @@
 
 (defn get-space (text)
   (if (check$ text space$?)
-    (get-space ([]$ text 1 (len$ text)))
+    (get-space (tail$ text))
     (list '(space) text)
   )
 )
 
 (defn get-undef (text) (tmpfn (acc text)
   (if (and text (not (has-tok? text)))
-    (rec (&$ acc ([]$ text 0)) ([]$ text 1 (len$ text)))
+    (rec (&$ acc ([]$ text 0)) (tail$ text))
     (list (list ' undefined acc) text)
   )
   ("" text)
@@ -98,7 +98,7 @@
     ((not text) ())
     ((has-num? text) (get-num text))
     ((match-sym text syms) (assoc (sym (match-sym text syms))
-      (list (list ' symbol sym) ([]$ text (len$ sym) (len$ text)))
+      (list (list ' symbol sym) (skip$ text (len$ sym)))
     ))
     ((has-space? text) (get-space text))
     (T (get-undef text))
