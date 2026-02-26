@@ -29,6 +29,7 @@
   "sinh" "cosh"
   "sin" "cos"
   "+" "-" "*" "/" "%" "^"
+  "(" ")"
 ))
 
 (defn add-sym (sym)
@@ -58,9 +59,12 @@
 
 (defn has-num? (text) (check$ text digit$?))
 
+(defn has-space? (text) (check$ text space$?))
+
 (defn has-tok? (text) (or
   (has-num? text)
   (truthy? (match-sym text syms))
+  (has-space? text)
 ))
 
 (defn get-num (text) (tmpfn (acc text)
@@ -73,6 +77,13 @@
   )
   (0 text)
 ))
+
+(defn get-space (text)
+  (if (check$ text space$?)
+    (get-space ([]$ text 1 (len$ text)))
+    (list '(space) text)
+  )
+)
 
 (defn get-undef (text) (tmpfn (acc text)
   (if (and text (not (has-tok? text)))
@@ -87,8 +98,9 @@
     ((not text) ())
     ((has-num? text) (get-num text))
     ((match-sym text syms) (assoc (sym (match-sym text syms))
-      (list sym ([]$ text (len$ sym) (len$ text)))
+      (list (list ' symbol sym) ([]$ text (len$ sym) (len$ text)))
     ))
+    ((has-space? text) (get-space text))
     (T (get-undef text))
   )
 )
