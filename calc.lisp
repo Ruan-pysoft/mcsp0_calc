@@ -3,6 +3,7 @@
 
 (include "utils.lisp")
 (include "tokenise.lisp")
+(include "parse.lisp")
 
 (println "Currently got the follwing symbols defined:" syms)
 
@@ -15,3 +16,5 @@
 (add-sym "a")
 (println "Added symbol `a`:" syms)
 (println "re-Tokenised input:" (tokenise inp))
+
+(println "Parsed input:" (parse-infix (tokenise inp)))

@@ -55,8 +55,6 @@
   )
 )
 
-(defm =? (to) (\ (x) (= x to)))
-
 (defn has-num? (text) (check$ text digit$?))
 
 (defn has-space? (text) (check$ text space$?))

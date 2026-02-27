@@ -14,18 +14,18 @@
   ))
 
   (defm cond (() conditions)
-    (call tmpfn (list
-      '(.conds)
-      '(if .conds (do
+    (assoc (.cond.rec (\ (.conds)
+      (if .conds (do
         (assert (= (type (head .conds)) ' list))
         (assert (!= (head .conds) nil))
         (if (eval (head (head .conds)))
           (call do (tail (head .conds)))
-          (rec (tail .conds))
+          (.cond.rec (tail .conds))
         )
       ))
-      '(' conditions)
     ))
+      (.cond.rec ' conditions)
+    )
   )
 
   (defn join (l1 l2)
@@ -37,5 +37,8 @@
 
   (defn skip$ (s n) (if (>= (len$ s) n) ([]$ s n (len$ s)) ""))
   (defn tail$ (s) (skip$ s 1))
+
+
+  (defm =? (to) (\ (x) (= x to)))
 
 ))
