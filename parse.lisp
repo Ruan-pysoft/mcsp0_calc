@@ -62,11 +62,11 @@
       ((= tokens nil) (list lhs nil))
       ((check-next? tokens '(symbol "+")) (assoc
         (res (parse-base (skip-tok tokens)) val (head res) tokens (scd res))
-        (rec (+ lhs val) tokens)
+        (rec (list "+" lhs val) tokens)
       ))
       ((check-next? tokens '(symbol "-")) (assoc
         (res (parse-base (skip-tok tokens)) val (head res) tokens (scd res))
-        (rec (- lhs val) tokens)
+        (rec (list "-" lhs val) tokens)
       ))
       (T (list lhs tokens))
     )
