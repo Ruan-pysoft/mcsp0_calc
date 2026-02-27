@@ -55,22 +55,45 @@
   )
 )
 
+(defn parse-fact (tokens)
+  (call tmpfn (list
+    '(lhs tokens)
+    '(cond
+      ((= tokens nil) (list lhs nil))
+      ((check-next? tokens '(symbol "*")) (assoc
+        (res (parse-base (skip-tok tokens)) val (head res) tokens (scd res))
+        (rec (list "*" lhs val) tokens)
+      ))
+      ((check-next? tokens '(symbol "/")) (assoc
+        (res (parse-base (skip-tok tokens)) val (head res) tokens (scd res))
+        (rec (list "/" lhs val) tokens)
+      ))
+      ((check-next? tokens '(symbol "%")) (assoc
+        (res (parse-base (skip-tok tokens)) val (head res) tokens (scd res))
+        (rec (list "%" lhs val) tokens)
+      ))
+      (T (list lhs tokens))
+    )
+    (quote-each (parse-base tokens))
+  ))
+)
+
 (defn parse-term (tokens)
   (call tmpfn (list
     '(lhs tokens)
     '(cond
       ((= tokens nil) (list lhs nil))
       ((check-next? tokens '(symbol "+")) (assoc
-        (res (parse-base (skip-tok tokens)) val (head res) tokens (scd res))
+        (res (parse-fact (skip-tok tokens)) val (head res) tokens (scd res))
         (rec (list "+" lhs val) tokens)
       ))
       ((check-next? tokens '(symbol "-")) (assoc
-        (res (parse-base (skip-tok tokens)) val (head res) tokens (scd res))
+        (res (parse-fact (skip-tok tokens)) val (head res) tokens (scd res))
         (rec (list "-" lhs val) tokens)
       ))
       (T (list lhs tokens))
     )
-    (quote-each (parse-base tokens))
+    (quote-each (parse-fact tokens))
   ))
 )
 
