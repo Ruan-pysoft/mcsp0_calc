@@ -1,4 +1,5 @@
 (include "utils.lisp")
+(include "state.lisp")
 
 (defn check-n$ (text n predicate)
   (and
@@ -25,32 +26,11 @@
   )
 )
 
-(def syms '(
-  "sinh" "cosh"
-  "sin" "cos"
-  "+" "-" "*" "/" "%" "^"
-  "(" ")"
-))
-
-(defn add-sym (sym)
-  (:= syms (tmpfn (syms-back syms sym)
-    (if (and syms (< (len$ sym) (len$ (head syms))))
-      (rec
-        (append syms-back (head syms))
-        (tail syms)
-        sym
-      )
-      (join syms-back (cons sym syms))
-    )
-    (() syms sym)
-  ))
-)
-
-(defn match-sym (text syms)
-  (if syms
-    (if (starts-with$? text (head syms))
-      (head syms)
-      (match-sym text (tail syms))
+(defn match-collection (text collection)
+  (if collection
+    (if (starts-with$? text (head (head collection)))
+      (head collection)
+      (match-collection text (tail collection))
     )
   )
 )
@@ -61,7 +41,11 @@
 
 (defn has-tok? (text) (or
   (has-num? text)
-  (truthy? (match-sym text syms))
+  (truthy? (match-collection text unary-ops))
+  (truthy? (match-collection text unary-or-binary-ops))
+  (truthy? (match-collection text binary-ops))
+  (truthy? (match-collection text functions))
+  (truthy? (match-collection text variables))
   (has-space? text)
 ))
 
@@ -95,8 +79,20 @@
   (cond
     ((not text) ())
     ((has-num? text) (get-num text))
-    ((match-sym text syms) (assoc (sym (match-sym text syms))
-      (list (list ' symbol sym) (skip$ text (len$ sym)))
+    ((match-collection text unary-ops) (assoc (op (match-collection text unary-ops))
+      (list (cons ' op-u op) (skip$ text (len$ (head op))))
+    ))
+    ((match-collection text unary-or-binary-ops) (assoc (op (match-collection text unary-or-binary-ops))
+      (list (cons ' op-ub op) (skip$ text (len$ (head op))))
+    ))
+    ((match-collection text binary-ops) (assoc (op (match-collection text binary-ops))
+      (list (cons ' op-b op) (skip$ text (len$ (head op))))
+    ))
+    ((match-collection text functions) (assoc (fn (match-collection text functions))
+      (list (cons ' fn fn) (skip$ text (len$ (head fn))))
+    ))
+    ((match-collection text variables) (assoc (var (match-collection text variables))
+      (list (cons ' var var) (skip$ text (len$ (head var))))
     ))
     ((has-space? text) (get-space text))
     (T (get-undef text))

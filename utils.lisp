@@ -1,5 +1,4 @@
 (if (not utils-header-guard) (do
-
   (def utils-header-guard T)
 
   (defn quote-each (vals) (tmpfn (acc vals)
