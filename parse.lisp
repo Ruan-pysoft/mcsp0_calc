@@ -41,6 +41,9 @@
     ((check-next-tt? tokens ' number)
       (list (tv (fetch-tok tokens)) (skip-tok tokens))
     )
+    ((check-next-tt? tokens ' var)
+      (list (scd (fetch-tok tokens)) (skip-tok tokens))
+    )
     ((check-next? tokens '(symbol "("))
       (assoc (expr (parse-expression (skip-tok tokens)) val (head expr) tokens (scd expr))
         (cond
@@ -55,49 +58,30 @@
         )
       )
     )
+    (T
+      (write stderr (&$ "Unexpected tokens: " (repr tokens)))
+      (exit 1)
+    )
   )
 )
 
-(defn parse-fact (tokens)
-  (call tmpfn (list
-    '(lhs tokens)
-    '(cond
-      ((= tokens nil) (list lhs nil))
-      ((check-next? tokens '(symbol "*")) (assoc
-        (res (parse-base (skip-tok tokens)) val (head res) tokens (scd res))
-        (rec (list "*" lhs val) tokens)
-      ))
-      ((check-next? tokens '(symbol "/")) (assoc
-        (res (parse-base (skip-tok tokens)) val (head res) tokens (scd res))
-        (rec (list "/" lhs val) tokens)
-      ))
-      ((check-next? tokens '(symbol "%")) (assoc
-        (res (parse-base (skip-tok tokens)) val (head res) tokens (scd res))
-        (rec (list "%" lhs val) tokens)
-      ))
-      (T (list lhs tokens))
+((\* (().) ())
+(defn parse-juxtaposition (tokens)
+  (assoc (rec (\ (lhs tokens) (cond
+    ((println "juxtaposition with lhs" lhs "and tokens" tokens nil) nil)
+    ((= tokens nil) (list lhs nil))
+    ((tt? (head tokens) ' space) (list lhs tokens))
+    (T (assoc
+      (rest (parse-expression tokens))
+       val (head rest)
+       tokens (scd res)
+      )
+      (rec (list "juxtaposition" lhs val) tokens)
     )
-    (quote-each (parse-base tokens))
-  ))
+  )))
+    (call rec (parse-base tokens))
+  )
 )
-
-(defn parse-term (tokens)
-  (call tmpfn (list
-    '(lhs tokens)
-    '(cond
-      ((= tokens nil) (list lhs nil))
-      ((check-next? tokens '(symbol "+")) (assoc
-        (res (parse-fact (skip-tok tokens)) val (head res) tokens (scd res))
-        (rec (list "+" lhs val) tokens)
-      ))
-      ((check-next? tokens '(symbol "-")) (assoc
-        (res (parse-fact (skip-tok tokens)) val (head res) tokens (scd res))
-        (rec (list "-" lhs val) tokens)
-      ))
-      (T (list lhs tokens))
-    )
-    (quote-each (parse-fact tokens))
-  ))
 )
 
 (defn parse-binary (tokens prec precs)
@@ -116,7 +100,10 @@
       ;(println "Remaining tokens:" (skip-tok tokens))
       (assoc
         (op (fetch-tok tokens)
-         res (parse-binary (skip-tok tokens) (head precs) (tail precs))
+         res (if procs
+           (parse-binary (skip-tok tokens) (head precs) (tail precs))
+           (parse-base (skip-tok tokens))
+         )
          val (head res)
          tokens (scd res)
         )
