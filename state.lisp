@@ -6,8 +6,8 @@
   ))
 
   (def unary-ops (list
-    (list "sinh" nil)
-    (list "sin" nil) (list "cos" nil)
+    (list "sinh" "TODO: sinh")
+    (list "sin" "TODO: sin") (list "cos" "TODO: cos")
   ))
 
   (def unary-or-binary-ops (list
@@ -40,6 +40,43 @@
   )
 
   (def precedence-levels '(1 2 3))
+
+  (defn add-precedence-level (n)
+    (:= precedence-levels (tmpfn (p-back p n)
+      (cond
+        ((and p (< (head p) n))
+          (rec
+            (append p-back (head p))
+            (tail p)
+            n
+          )
+        )
+        ((and p (= (head p) n))
+          (join p-back p)
+        )
+        (T (join p-back (cons n p)))
+      )
+      (nil precedence-levels n)
+    ))
+  )
+
+  (defn add-unary-op (name op)
+    (add-element-to unary-ops (list name op))
+  )
+  (defn add-unary-or-binary-op (name precedence op) (do
+    (add-element-to unary-or-binary-ops (list name precedence op))
+    (add-precedence-level precedence)
+  ))
+  (defn add-binary-op (name precedence op) (do
+    (add-element-to binary-ops (list name precedence op))
+    (add-precedence-level precedence)
+  ))
+  (defn add-function (name arguments op)
+    (add-element-to functions (list name arguments op))
+  )
+  (defn add-variable (name val)
+    (add-element-to variables (list name val))
+  )
 
   ((\* (().) ())
   (def syms '(

@@ -3,7 +3,7 @@
 
 (include "utils.lisp")
 (include "tokenise.lisp")
-; (include "parse.lisp")
+(include "parse.lisp")
 
 (println "Currently got the follwing symbols defined:" syms)
 
@@ -13,10 +13,8 @@
 (println "Got input:" inp)
 (println "Tokenised input:" (tokenise inp))
 
-(add-element-to variables (list "a" 3))
+(add-variable "a" 3)
 (println "Added variable `a`:" variables)
 (println "re-Tokenised input:" (tokenise inp))
-
-(exit)
 
 (println "Parsed input:" (parse-infix (tokenise inp)))
