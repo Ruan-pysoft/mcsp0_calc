@@ -51,7 +51,7 @@
             (list val (skip-tok tokens))
           )
           (T
-            (write stderr "ERROR: expected matching closing paren")
+            (write stderr (&$ "ERROR: expected matching closing paren @ " (repr tokens) # \n))
             (exit 1)
             ; TODO: proper error handling & reporting
           )
@@ -59,7 +59,7 @@
       )
     )
     (T
-      (write stderr (&$ "Unexpected tokens: " (repr tokens)))
+      (write stderr (&$ "Unexpected tokens: " (repr tokens) # \n))
       (exit 1)
     )
   )
@@ -87,7 +87,7 @@
 (defn parse-unary (tokens)
   (cond
     ((= tokens nil)
-      (write stderr "ERROR: Unexpected EOF when parsing unary expression")
+      (write stderr "ERROR: Unexpected EOF when parsing unary expression\n")
       (exit 1)
     )
     ((or (tt? (fetch-tok tokens) ' op-u) (tt? (fetch-tok tokens) ' op-ub))

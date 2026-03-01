@@ -13,8 +13,11 @@
 (println "Got input:" inp)
 (println "Tokenised input:" (tokenise inp))
 
-(add-variable "a" 3)
-(println "Added variable `a`:" variables)
+(add-variable "a" 40)
+(add-variable "b" 41)
+(add-variable "c" 42)
+(add-variable "d" 43)
+(println "Added variables:" variables)
 (println "re-Tokenised input:" (tokenise inp))
 
 (println "Parsed input:" (parse-infix (tokenise inp)))

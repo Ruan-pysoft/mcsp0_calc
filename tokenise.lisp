@@ -35,12 +35,23 @@
   )
 )
 
+(defn match-sym (text) (tmpfn (text syms)
+  (if syms
+    (if (starts-with$? text (head syms))
+      (head syms)
+      (rec text (tail syms))
+    )
+  )
+  (text syms)
+))
+
 (defn has-num? (text) (check$ text digit$?))
 
 (defn has-space? (text) (check$ text space$?))
 
 (defn has-tok? (text) (or
   (has-num? text)
+  (truthy? (match-sym text))
   (truthy? (match-collection text unary-ops))
   (truthy? (match-collection text unary-or-binary-ops))
   (truthy? (match-collection text binary-ops))
@@ -79,6 +90,9 @@
   (cond
     ((not text) ())
     ((has-num? text) (get-num text))
+    ((match-sym text) (assoc (sym (match-sym text))
+      (list (list ' symbol sym) (skip$ text (len$ sym)))
+    ))
     ((match-collection text unary-ops) (assoc (op (match-collection text unary-ops))
       (list (cons ' op-u op) (skip$ text (len$ (head op))))
     ))

@@ -11,17 +11,21 @@
   ))
 
   (def unary-or-binary-ops (list
-    (list "-" 1 -) (list "+" 1 +)
+    ;(list "-" 1 -) (list "+" 1 +)
+    (list "-" 1 "-") (list "+" 1 "+")
   ))
 
   (def binary-ops (list
-    (list "*" 2 *) (list "/" 2 /) (list "%" 2 /)
-    (list "^" 3 ^)
+    ;(list "*" 2 *) (list "/" 2 /) (list "%" 2 %)
+    ;(list "^" 3 **)
+    (list "*" 2 "*") (list "/" 2 "/") (list "%" 2 "%")
+    (list "^" 3 "**")
   ))
 
   (def functions ())
   (def variables (list
     (list "TAU" 6)
+    (list "PI" 3)
   ))
 
   (defn add-element (collection element) (tmpfn (c-back c e)
