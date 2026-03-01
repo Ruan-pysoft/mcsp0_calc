@@ -99,7 +99,7 @@
         )
         (if (tt? op ' op-u)
           (list (list (nth op 2) val) tokens)
-          (list (list (scd op) val) tokens)
+          (list (list (nth op 3) val) tokens)
         )
       )
     )
@@ -123,7 +123,7 @@
       ;(println "Remaining tokens:" (skip-tok tokens))
       (assoc
         (op (fetch-tok tokens)
-         res (if procs
+         res (if precs
            (parse-binary (skip-tok tokens) (head precs) (tail precs))
            (parse-unary (skip-tok tokens))
          )
