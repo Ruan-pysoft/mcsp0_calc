@@ -84,6 +84,29 @@
 )
 )
 
+(defn parse-unary (tokens)
+  (cond
+    ((= tokens nil)
+      (write stderr "ERROR: Unexpected EOF when parsing unary expression")
+      (exit 1)
+    )
+    ((or (tt? (fetch-tok tokens) ' op-u) (tt? (fetch-tok tokens) ' op-ub))
+      (assoc
+        (op (fetch-tok tokens)
+         res (parse-unary (skip-tok tokens))
+         val (head res)
+         tokens (scd res)
+        )
+        (if (tt? op ' op-u)
+          (list (list (nth op 2) val) tokens)
+          (list (list (scd op) val) tokens)
+        )
+      )
+    )
+    (T (parse-base tokens))
+  )
+)
+
 (defn parse-binary (tokens prec precs)
   ;(do (println "parsing binary expression with precedence" prec "from:" tokens)
   (assoc (rec (\ (lhs tokens) (cond
@@ -102,7 +125,7 @@
         (op (fetch-tok tokens)
          res (if procs
            (parse-binary (skip-tok tokens) (head precs) (tail precs))
-           (parse-base (skip-tok tokens))
+           (parse-unary (skip-tok tokens))
          )
          val (head res)
          tokens (scd res)
@@ -114,7 +137,7 @@
   )))
     (if precs
       (call rec (parse-binary tokens (head precs) (tail precs)))
-      (call rec (parse-base tokens))
+      (call rec (parse-unary tokens))
     )
   )
   ;)
