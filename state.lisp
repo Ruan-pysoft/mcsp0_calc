@@ -6,8 +6,9 @@
   ))
 
   (def unary-ops (list
-    (list "sinh" "TODO: sinh")
-    (list "sin" "TODO: sin") (list "cos" "TODO: cos")
+    (list "sinh" "sinh")
+    (list "sin" "sin") (list "cos" "cos")
+    (list "floor" "floor") (list "ceil" "ceil") (list "round" "round")
   ))
 
   (def unary-or-binary-ops (list

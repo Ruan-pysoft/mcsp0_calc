@@ -64,11 +64,23 @@
 )
 
 (defn divide (a b)
-      (do (println "/" a b)
   (simplify
     (list ' over (* (scd a) (nth b 2)) (* (nth a 2) (scd b)))
   )
+)
+
+(defn floor (x)
+  (list ' over (/ (scd a) (nth a 2)) 1)
+)
+
+(defn ceil (x)
+  (assoc (n (floor (list ' over (- (scd x) 1) (nth x 2))))
+    (simplify (list ' over (+ (scd n) (nth n 2)) (nth n 2)))
   )
+)
+
+(defn round (x)
+  (floor (add x '(over 1 2)))
 )
 
 (defn call.function (fn args)
@@ -81,6 +93,9 @@
     ((= fn "/") (call divide args))
     ;((= fn "**") (call ** args))
     ;((= fn "%") (call % args))
+    ((= fn "floor") (call floor args))
+    ((= fn "ceil") (call ceil args))
+    ((= fn "round") (call round args))
     (T (println "unrecognised function" fn) (exit 1))
   )
 )
