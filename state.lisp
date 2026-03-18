@@ -24,8 +24,8 @@
 
   (def functions ())
   (def variables (list
-    (list "TAU" 6)
-    (list "PI" 3)
+    (list "TAU" '(over 44 7))
+    (list "PI" '(over 22 7))
   ))
 
   (defn add-element (collection element) (tmpfn (c-back c e)

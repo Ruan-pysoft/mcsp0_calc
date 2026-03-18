@@ -39,7 +39,7 @@
 (defn parse-base (tokens)
   (cond
     ((check-next-tt? tokens ' number)
-      (list (tv (fetch-tok tokens)) (skip-tok tokens))
+      (list (list ' over (tv (fetch-tok tokens)) 1) (skip-tok tokens))
     )
     ((check-next-tt? tokens ' var)
       (list (scd (fetch-tok tokens)) (skip-tok tokens))

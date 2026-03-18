@@ -1,21 +1,37 @@
 (include "utils.lisp")
 (include "state.lisp")
 
-(defn map (fn list)
-  (if list
-    (cons (fn (head list)) (map fn (tail list)))
+(defn map (fn lst)
+  (if lst
+    (cons (fn (head lst)) (map fn (tail lst)))
+  )
+)
+
+(defn add (a () b)
+  (if b
+    (assoc (b (head b))
+      (if (= (nth a 2) (nth b 2))
+        (list ' over (+ (scd a) (scd b)) (nth a 2))
+        (add
+          (list ' over (* (scd a) (nth b 2)) (* (nth a 2) (nth b 2)))
+          (list ' over (* (scd b) (nth a 2)) (* (nth a 2) (nth b 2)))
+        )
+      )
+    )
+    a
   )
 )
 
 (defn call.function (fn args)
   (cond
-    ((= fn "+") (call + args))
-    ((= fn "-") (call - args))
-    ((= fn "*") (call * args))
-    ((= fn "juxtapose") (call * args))
-    ((= fn "/") (call / args))
-    ((= fn "**") (call ** args))
-    ((= fn "%") (call % args))
+    ((= fn "+") (call add args))
+    ;((= fn "-") (call - args))
+    ;((= fn "*") (call * args))
+    ;((= fn "juxtapose") (call * args))
+    ;((= fn "/") (call / args))
+    ;((= fn "**") (call ** args))
+    ;((= fn "%") (call % args))
+    (T (println "unrecognised function" fn) (exit 1))
   )
 )
 
@@ -37,7 +53,7 @@
 
 (defn calculate (expr)
   (cond
-    ((= (type expr) ' number)
+    ((and (= (type expr) ' list) (= (head expr) ' over))
       expr
     )
     ((= (type expr) ' list)

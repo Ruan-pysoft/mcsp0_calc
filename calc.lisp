@@ -12,10 +12,10 @@
 (println "Got input:" inp)
 (println "Tokenised input:" (tokenise inp))
 
-(add-variable "a" 40)
-(add-variable "b" 41)
-(add-variable "c" 42)
-(add-variable "d" 43)
+(add-variable "a" '(over 40 1))
+(add-variable "b" '(over 41 1))
+(add-variable "c" '(over 42 1))
+(add-variable "d" '(over 43 1))
 (println "Added variables:" variables)
 (println "re-Tokenised input:" (tokenise inp))
 
