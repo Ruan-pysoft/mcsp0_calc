@@ -7,11 +7,20 @@
   )
 )
 
+(defn simplify (n)
+  (if (< (nth n 2) 0)
+    (simplify (list ' over (- (scd n)) (- (nth n 2))))
+    (assoc (fact (gcd (scd n) (nth n 2)))
+      (list ' over (/ (scd n) fact) (/ (nth n 2) fact))
+    )
+  )
+)
+
 (defn add (a () b)
   (if b
     (assoc (b (head b))
       (if (= (nth a 2) (nth b 2))
-        (list ' over (+ (scd a) (scd b)) (nth a 2))
+        (simplify (list ' over (+ (scd a) (scd b)) (nth a 2)))
         (add
           (list ' over (* (scd a) (nth b 2)) (* (nth a 2) (nth b 2)))
           (list ' over (* (scd b) (nth a 2)) (* (nth a 2) (nth b 2)))
@@ -29,13 +38,47 @@
   )
 )
 
+(defn gcd (a b)
+  (cond
+    ((or (= a 1) (= b 1)) 1)
+    ((< a 0) (gcd (- a) b))
+    ((< b 0) (gcd a (- b)))
+    ((> a b) (gcd b a))
+    ((= a b) a)
+    ((= a 0) b)
+    (T (gcd (% b a) a))
+  )
+)
+
+(defn gcd.op (a b)
+  (if (or (!= (nth a 2) 1) (!= (nth a 2) 1))
+    (do (println "gcd is not defined on non-integers!") (exit 1))
+    (list ' over (gcd (scd a) (scd b)) 1)
+  )
+)
+
+(defn multiply (a b)
+  (simplify
+    (list ' over (* (scd a) (scd b)) (* (nth a 2) (nth b 2)))
+  )
+)
+
+(defn divide (a b)
+      (do (println "/" a b)
+  (simplify
+    (list ' over (* (scd a) (nth b 2)) (* (nth a 2) (scd b)))
+  )
+  )
+)
+
 (defn call.function (fn args)
   (cond
     ((= fn "+") (call add args))
     ((= fn "-") (call sub args))
-    ;((= fn "*") (call * args))
-    ;((= fn "juxtapose") (call * args))
-    ;((= fn "/") (call / args))
+    ((= fn "gcd") (call gcd.op args))
+    ((= fn "*") (call multiply args))
+    ((= fn "juxtapose") (call multiply args))
+    ((= fn "/") (call divide args))
     ;((= fn "**") (call ** args))
     ;((= fn "%") (call % args))
     (T (println "unrecognised function" fn) (exit 1))

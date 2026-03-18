@@ -20,6 +20,7 @@
     ;(list "^" 3 **)
     (list "*" 2 "*") (list "/" 2 "/") (list "%" 2 "%")
     (list "^" 3 "**")
+    (list "gcd" 4 "gcd")
   ))
 
   (def functions ())
@@ -43,7 +44,7 @@
     (:= collection (add-element collection element))
   )
 
-  (def precedence-levels '(1 2 3))
+  (def precedence-levels '(1 2 3 4))
 
   (defn add-precedence-level (n)
     (:= precedence-levels (tmpfn (p-back p n)

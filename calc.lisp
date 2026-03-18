@@ -28,18 +28,21 @@
   )
 )
 (defn rational.decimal (rat)
-  (&$ (repr (/ (scd rat) (nth rat 2))) # . (tmpfn (acc digits num den)
-    (if digits
-      (rec
-        (&$ acc (+ # 0 (/ (* num 10) den)))
-        (- digits 1)
-        (- (* num 10) (* (/ (* num 10) den) den))
-        den
+  (if (= (nth rat 2) 0)
+    "#div0"
+    (&$ (repr (/ (scd rat) (nth rat 2))) # . (tmpfn (acc digits num den)
+      (if digits
+        (rec
+          (&$ acc (+ # 0 (/ (* num 10) den)))
+          (- digits 1)
+          (- (* num 10) (* (/ (* num 10) den) den))
+          den
+        )
+        acc
       )
-      acc
-    )
-    ("" 6 (- (scd rat) (* (/ (scd rat) (nth rat 2)) (nth rat 2))) (nth rat 2))
-  ))
+      ("" 6 (- (scd rat) (* (/ (scd rat) (nth rat 2)) (nth rat 2))) (nth rat 2))
+    ))
+  )
 )
 
 (defn show-rational (rat)
