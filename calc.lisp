@@ -4,6 +4,7 @@
 (include "utils.lisp")
 (include "tokenise.lisp")
 (include "parse.lisp")
+(include "calculate.lisp")
 
 (write stdout "> ")
 (def inp (readline stdin))
@@ -19,3 +20,5 @@
 (println "re-Tokenised input:" (tokenise inp))
 
 (println "Parsed input:" (parse-infix (tokenise inp)))
+
+(println "Result:" (calculate (parse-infix (tokenise inp))))
