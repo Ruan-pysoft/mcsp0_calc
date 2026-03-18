@@ -22,10 +22,17 @@
   )
 )
 
+(defn sub (a () b)
+  (if b
+    (add a (sub (head b)))
+    (list ' over (- (scd a)) (nth a 2))
+  )
+)
+
 (defn call.function (fn args)
   (cond
     ((= fn "+") (call add args))
-    ;((= fn "-") (call - args))
+    ((= fn "-") (call sub args))
     ;((= fn "*") (call * args))
     ;((= fn "juxtapose") (call * args))
     ;((= fn "/") (call / args))

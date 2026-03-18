@@ -21,4 +21,11 @@
 
 (println "Parsed input:" (parse-infix (tokenise inp)))
 
-(println "Result:" (calculate (parse-infix (tokenise inp))))
+(defn rational.repr (rat)
+  (if (= (nth rat 2) 1)
+    (repr (scd rat))
+    (&$ (repr (scd rat)) "/" (repr (nth rat 2)))
+  )
+)
+
+(println "Result:" (rational.repr (calculate (parse-infix (tokenise inp)))))
