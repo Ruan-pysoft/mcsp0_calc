@@ -7,11 +7,28 @@
   )
 )
 
+(def max_num (<< 1 48))
+(def max_den (<< 1 32))
+
+(defn reduce (n)
+  (if (> (nth n 2) max_den)
+    (assoc (fact (+ (/ (nth n 2) max_den) 1))
+      (simplify (list ' over (/ (scd n) fact) (/ (nth n 2) fact)))
+    )
+    (if (> (scd n) max_num)
+      (assoc (fact (+ (/ (scd n) max_num) 1))
+        (simplify (list ' over (/ (scd n) fact) (/ (nth n 2) fact)))
+      )
+      n
+    )
+  )
+)
+
 (defn simplify (n)
   (if (< (nth n 2) 0)
     (simplify (list ' over (- (scd n)) (- (nth n 2))))
     (assoc (fact (gcd (scd n) (nth n 2)))
-      (list ' over (/ (scd n) fact) (/ (nth n 2) fact))
+      (reduce (list ' over (/ (scd n) fact) (/ (nth n 2) fact)))
     )
   )
 )
@@ -120,6 +137,22 @@
   )
 )
 
+(defn sin (x)
+  (add
+    x
+    (add
+      (sub (divide (power-int x 3) '(over 6 1)))
+      (add
+        (divide (power-int x 5) '(over 120 1))
+        (add
+          (sub (divide (power-int x 7) '(over 5040 1)))
+          (divide (power-int x 9) '(over 362880 1))
+        )
+      )
+    )
+  )
+)
+
 (defn call.function (fn args)
   (cond
     ((= fn "+") (call add args))
@@ -135,6 +168,7 @@
     ((= fn "floor") (call floor args))
     ((= fn "ceil") (call ceil args))
     ((= fn "round") (call round args))
+    ((= fn "sin") (call sin args))
     (T (println "unrecognised function" fn) (exit 1))
   )
 )
