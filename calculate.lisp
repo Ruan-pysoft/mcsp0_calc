@@ -153,6 +153,39 @@
   )
 )
 
+(defn cos (x)
+  (add
+    '(over 1 1)
+    (add
+      (sub (divide (power-int x 2) '(over 2 1)))
+      (add
+        (divide (power-int x 4) '(over 24 1))
+        (add
+          (sub (divide (power-int x 6) '(over 720 1)))
+          (divide (power-int x 8) '(over 40320 1))
+        )
+      )
+    )
+  )
+)
+
+; WARN: untested!
+(defn sinh (x)
+  (add
+    x
+    (add
+      (divide (power-int x 3) '(over 6 1))
+      (add
+        (divide (power-int x 5) '(over 120 1))
+        (add
+          (divide (power-int x 7) '(over 5040 1))
+          (divide (power-int x 9) '(over 362880 1))
+        )
+      )
+    )
+  )
+)
+
 (defn call.function (fn args)
   (cond
     ((= fn "+") (call add args))
@@ -168,7 +201,9 @@
     ((= fn "floor") (call floor args))
     ((= fn "ceil") (call ceil args))
     ((= fn "round") (call round args))
+    ((= fn "sinh") (call sinh args))
     ((= fn "sin") (call sin args))
+    ((= fn "cos") (call cos args))
     (T (println "unrecognised function" fn) (exit 1))
   )
 )
