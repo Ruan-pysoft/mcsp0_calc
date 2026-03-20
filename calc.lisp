@@ -42,7 +42,7 @@
   (def inp (readline stdin))
 
 ; (println "Got input:" inp)
-(println "Tokenised input:" (tokenise inp))
+; (println "Tokenised input:" (tokenise inp))
 
 ; (add-variable "a" '(over 40 1))
 ; (add-variable "b" '(over 41 1))
@@ -51,9 +51,17 @@
 ; (println "Added variables:" variables)
 ; (println "re-Tokenised input:" (tokenise inp))
 
-(println "Parsed input:" (parse-infix (tokenise inp)))
+; (println "Parsed input:" (parse-infix (tokenise inp)))
 
-  (println "Result:" (show-rational (calculate (parse-infix (tokenise inp)))))
+  (def parsed (parse-infix (tokenise inp)))
+
+  (if (= (head parsed) ' let)
+    (assoc (val (calculate (nth parsed 2))) (do
+      (add-variable (scd parsed) val)
+      (println (scd parsed) "=" (show-rational val))
+    ))
+    (println "Result:" (show-rational (calculate parsed)))
+  )
 
   (rec)
 ) ())

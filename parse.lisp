@@ -162,18 +162,20 @@
     (assert (= (head tokens) '(keyword-let)))
     (:= tokens (tail tokens))
     (if (identifier-like? (fetch-tok tokens))
-      (assoc (name (scd (fetch-tok tokens)) tokens (skip-tok tokens))
-        (do
-          (println "got variable" name "and rest" tokens)
-          '(())
-        )
-      )
+      (assoc (name (scd (fetch-tok tokens)) tokens (skip-tok tokens)) (do
+          (if (or (not (identifier-like? (fetch-tok tokens))) (!= (scd (fetch-tok tokens)) "=")) (do
+            (write stderr (&$ "ERROR: in let, expected =, but got an unexpected token " (repr tokens) # \n))
+            (exit 1)
+          ))
+          (assoc (expr-and-toks (parse-expression (skip-tok tokens)) expr (head expr-and-toks) tokens (scd expr-and-toks))
+            (list (list ' let name expr) tokens)
+          )
+      ))
       (do
         (write stderr (&$ "ERROR: in let, expected an identifier, but got an unexpected token " (repr tokens) # \n))
         (exit 1)
       )
     )
-    '(())
   )
 )
 
