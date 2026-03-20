@@ -105,6 +105,21 @@
   (floor (add x '(over 1 2)))
 )
 
+(defn-binexp power-int
+  ""
+  multiply ' '(over 1 1)
+)
+
+(defn power (a b)
+  (if (= (nth b 2) 1)
+    (power-int a (scd b))
+    (do
+      (println "power of not yet implemented for non-integer powers")
+      (exit 1)
+    )
+  )
+)
+
 (defn call.function (fn args)
   (cond
     ((= fn "+") (call add args))
@@ -113,7 +128,7 @@
     ((= fn "*") (call multiply args))
     ((= fn "juxtapose") (call multiply args))
     ((= fn "/") (call divide args))
-    ;((= fn "**") (call ** args))
+    ((= fn "**") (call power args))
     ((= fn "%") (call modulo args))
     ((= fn "ipart") (call ipart args))
     ((= fn "fpart") (call fpart args))
