@@ -69,6 +69,11 @@
   )
 )
 
+; https://math.stackexchange.com/a/621014
+(defn modulo (a b)
+  (sub a (multiply b (floor (divide a b))))
+)
+
 (defn ipart (x)
   "round towards zero"
   (list ' over (/ (scd x) (nth x 2)) 1)
@@ -109,7 +114,7 @@
     ((= fn "juxtapose") (call multiply args))
     ((= fn "/") (call divide args))
     ;((= fn "**") (call ** args))
-    ;((= fn "%") (call % args))
+    ((= fn "%") (call modulo args))
     ((= fn "ipart") (call ipart args))
     ((= fn "fpart") (call fpart args))
     ((= fn "floor") (call floor args))
