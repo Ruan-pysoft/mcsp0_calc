@@ -69,13 +69,30 @@
   )
 )
 
+(defn ipart (x)
+  "round towards zero"
+  (list ' over (/ (scd x) (nth x 2)) 1)
+)
+
+(defn fpart (x)
+  (sub x (ipart x))
+)
+
 (defn floor (x)
-  (list ' over (/ (scd a) (nth a 2)) 1)
+  (if (< (scd x) 0)
+    (assoc (n (ipart (list ' over (+ (scd x) 1) (nth x 2))))
+      (list ' over (- (scd n) 1) 1)
+    )
+    (ipart x)
+  )
 )
 
 (defn ceil (x)
-  (assoc (n (floor (list ' over (- (scd x) 1) (nth x 2))))
-    (simplify (list ' over (+ (scd n) (nth n 2)) (nth n 2)))
+  (if (< (scd x) 0)
+    (ipart x)
+    (assoc (n (ipart (list ' over (- (scd x) 1) (nth x 2))))
+      (list ' over (+ (scd n) 1) 1)
+    )
   )
 )
 
@@ -93,6 +110,8 @@
     ((= fn "/") (call divide args))
     ;((= fn "**") (call ** args))
     ;((= fn "%") (call % args))
+    ((= fn "ipart") (call ipart args))
+    ((= fn "fpart") (call fpart args))
     ((= fn "floor") (call floor args))
     ((= fn "ceil") (call ceil args))
     ((= fn "round") (call round args))

@@ -8,6 +8,7 @@
   (def unary-ops (list
     (list "sinh" "sinh")
     (list "sin" "sin") (list "cos" "cos")
+    (list "ipart" "ipart") (list "fpart" "fpart")
     (list "floor" "floor") (list "ceil" "ceil") (list "round" "round")
   ))
 
