@@ -35,6 +35,15 @@
     )
   )
 )
+(defn identifier-like? (token) (or
+  (tt? token ' undefined)
+  (tt? token ' symbol)
+  (tt? token ' op-u)
+  (tt? token ' op-ub)
+  (tt? token ' op-b)
+  (tt? token ' fn)
+  (tt? token ' var)
+))
 
 (defn parse-base (tokens)
   (cond
@@ -148,6 +157,33 @@
   (parse-binary tokens (head precedence-levels) (tail precedence-levels))
 )
 
+(defn parse-let (tokens)
+  (do
+    (assert (= (head tokens) '(keyword-let)))
+    (:= tokens (tail tokens))
+    (if (identifier-like? (fetch-tok tokens))
+      (assoc (name (scd (fetch-tok tokens)) tokens (skip-tok tokens))
+        (do
+          (println "got variable" name "and rest" tokens)
+          '(())
+        )
+      )
+      (do
+        (write stderr (&$ "ERROR: in let, expected an identifier, but got an unexpected token " (repr tokens) # \n))
+        (exit 1)
+      )
+    )
+    '(())
+  )
+)
+
+(defn parse-stmt (tokens)
+  (cond
+    ((and tokens (= (head tokens) '(keyword-let))) (parse-let tokens))
+    (T (parse-expression tokens))
+  )
+)
+
 (defn parse-infix (tokens)
-  (head (parse-expression tokens))
+  (head (parse-stmt tokens))
 )

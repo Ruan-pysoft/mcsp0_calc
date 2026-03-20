@@ -49,8 +49,15 @@
 
 (defn has-space? (text) (check$ text space$?))
 
+(defn has-let? (text) (and
+  (starts-with$? text "let")
+  (>= (len$ text) 4)
+  (space$? ([]$ text 3))
+))
+
 (defn has-tok? (text) (or
   (has-num? text)
+  (truthy? (has-let? text))
   (truthy? (match-sym text))
   (truthy? (match-collection text unary-ops))
   (truthy? (match-collection text unary-or-binary-ops))
@@ -78,6 +85,8 @@
   )
 )
 
+(defn get-let (text) (list '(keyword-let) (skip$ text 3)))
+
 (defn get-undef (text) (tmpfn (acc text)
   (if (and text (not (has-tok? text)))
     (rec (&$ acc ([]$ text 0)) (tail$ text))
@@ -90,6 +99,7 @@
   (cond
     ((not text) ())
     ((has-num? text) (get-num text))
+    ((has-let? text) (get-let text))
     ((match-sym text) (assoc (sym (match-sym text))
       (list (list ' symbol sym) (skip$ text (len$ sym)))
     ))
